@@ -31,24 +31,22 @@ export default class CharacterController extends BaseController {
     }
 
     return super.Success(res, {
-      results: characters,
-      count: characters.length
+      results: characters
     })
   }
 
   async create (req, res) {
-    let character
     let created
 
     try {
-      [character, created] = await models.Character.findOrCreate({
+      created = await models.Character.findOrCreate({
         where: { name: req.body.name },
         defaults: {
           status: req.body.status,
           species: req.body.species,
           origin: req.body.origin
         }
-      })
+      })[1]
     } catch (error) {
       if (error.name === 'SequelizeValidationError') {
         // If there are more than one validation errors, show only the first one
