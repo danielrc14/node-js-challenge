@@ -26,4 +26,26 @@ export default class RickAndMortyApiService {
       hasNext: response.data.info.next !== null
     }
   }
+
+  async getCharacterByName (name) {
+    let response
+    try {
+      response = await this.axiosInstance.get(`/character?name=${name}`)
+    } catch (error) {
+      if (error.response.status === 404) {
+        return undefined
+      }
+      throw error
+    }
+    if (response.status === 200 && response.data.info.count > 0) {
+      const result = response.data.results[0]
+      return {
+        name: result.name,
+        status: result.status,
+        species: result.species,
+        origin: result.origin.name
+      }
+    }
+    return undefined
+  }
 }
