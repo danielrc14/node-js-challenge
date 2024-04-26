@@ -37,7 +37,38 @@ export default class CharacterController extends BaseController {
   }
 
   async create (req, res) {
-    return super.Success(res, '')
+    let character
+    let created
+
+    try {
+      [character, created] = await models.Character.findOrCreate({
+        where: { name: req.body.name },
+        defaults: {
+          status: req.body.status,
+          species: req.body.species,
+          origin: req.body.origin
+        }
+      })
+    } catch (error) {
+      if (error.name === 'SequelizeValidationError') {
+        // If there are more than one validation errors, show only the first one
+        return super.ErrorBadRequest(res, {
+          message: error.errors[0].message
+        })
+      }
+      // General error catching
+      return super.InternalError(res, error)
+    }
+
+    if (created) {
+      return super.Success(res, {
+        message: 'Character created successfully'
+      })
+    } else {
+      return super.ErrorBadRequest(res, {
+        message: 'Character already exists'
+      })
+    }
   }
 
   async show (req, res) {
