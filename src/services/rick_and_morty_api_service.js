@@ -18,7 +18,7 @@ export default class RickAndMortyApiService {
         name: character.name,
         status: character.status,
         species: character.species,
-        originName: character.origin.name
+        origin: character.origin.name
       }
     })
     return {
