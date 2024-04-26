@@ -16,7 +16,7 @@ routes.post(
 )
 
 routes.get(
-  '/',
+  '/:name',
   asyncHandler(new CharacterController().show)
 )
 

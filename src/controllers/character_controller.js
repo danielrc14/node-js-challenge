@@ -70,6 +70,22 @@ export default class CharacterController extends BaseController {
   }
 
   async show (req, res) {
-    return super.Success(res, '')
+    let character = await models.Character.findOne({
+      attributes: ['name', 'status', 'species', 'origin'],
+      where: { name: req.params.name }
+    })
+    
+    if (!character) {
+      const rickAndMortyApiService = new RickAndMortyApiService()
+      character = await rickAndMortyApiService.getCharacterByName(req.params.name)
+    }
+
+    if (!character) {
+      return super.NotFound(res, {
+        message: 'Character not found'
+      })
+    }
+
+    return super.Success(res, character)
   }
 }
