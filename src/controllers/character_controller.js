@@ -1,6 +1,7 @@
 import models from '../models'
 import BaseController from './base'
 import RickAndMortyApiService from '../services/rick_and_morty_api_service'
+const { Op } = require('sequelize')
 
 export default class CharacterController extends BaseController {
   CharacterController () { }
@@ -72,9 +73,11 @@ export default class CharacterController extends BaseController {
   async show (req, res) {
     let character = await models.Character.findOne({
       attributes: ['name', 'status', 'species', 'origin'],
-      where: { name: req.params.name }
+      where: {
+        name: { [Op.iLike]: `%${req.params.name}%` }
+      }
     })
-    
+
     if (!character) {
       const rickAndMortyApiService = new RickAndMortyApiService()
       character = await rickAndMortyApiService.getCharacterByName(req.params.name)
