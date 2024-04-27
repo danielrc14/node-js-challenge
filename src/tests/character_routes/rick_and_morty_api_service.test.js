@@ -4,14 +4,14 @@ import RickAndMortyApiService from '../../services/rick_and_morty_api_service'
 jest.mock('axios')
 
 describe('Test Rick and Morty API Service', () => {
-  test('Test calling the character list endpoint', () =>{
+  test('Test calling the character list endpoint', () => {
     const axiosGet = jest.fn().mockResolvedValue({
       data: {
         results: new Array(20).fill({
           name: 'Rick',
           status: 'Alive',
           species: 'Human',
-          origin: { name: 'Earth'}
+          origin: { name: 'Earth' }
         }),
         info: {
           next: 'test'
@@ -25,31 +25,33 @@ describe('Test Rick and Morty API Service', () => {
     })
 
     const service = new RickAndMortyApiService()
-    const response = service.getCharacters()
-    expect(axiosGet).toHaveBeenCalledWith('/character', {
-      params: {
-        page: 1
-      }
-    })
-    expect(response).resolves.toEqual({
-      results: new Array(20).fill({
-        name: 'Rick',
-        status: 'Alive',
-        species: 'Human',
-        origin: 'Earth'
-      }),
-      hasNext: true
-    })
+    service.getCharacters()
+      .then(response => {
+        expect(axiosGet).toHaveBeenCalledWith('/character', {
+          params: {
+            page: 1
+          }
+        })
+        expect(response).toEqual({
+          results: new Array(20).fill({
+            name: 'Rick',
+            status: 'Alive',
+            species: 'Human',
+            origin: 'Earth'
+          }),
+          hasNext: true
+        })
+      })
   })
 
-  test('Test calling the last page on the character list endpoint', () =>{
+  test('Test calling the last page on the character list endpoint', () => {
     const axiosGet = jest.fn().mockResolvedValue({
       data: {
         results: new Array(20).fill({
           name: 'Rick',
           status: 'Alive',
           species: 'Human',
-          origin: { name: 'Earth'}
+          origin: { name: 'Earth' }
         }),
         info: {
           next: null
@@ -63,31 +65,33 @@ describe('Test Rick and Morty API Service', () => {
     })
 
     const service = new RickAndMortyApiService()
-    const response = service.getCharacters(4)
-    expect(axiosGet).toHaveBeenCalledWith('/character', {
-      params: {
-        page: 4
-      }
-    })
-    expect(response).resolves.toEqual({
-      results: new Array(20).fill({
-        name: 'Rick',
-        status: 'Alive',
-        species: 'Human',
-        origin: 'Earth'
-      }),
-      hasNext: false
-    })
+    service.getCharacters(4)
+      .then(response => {
+        expect(axiosGet).toHaveBeenCalledWith('/character', {
+          params: {
+            page: 4
+          }
+        })
+        expect(response).toEqual({
+          results: new Array(20).fill({
+            name: 'Rick',
+            status: 'Alive',
+            species: 'Human',
+            origin: 'Earth'
+          }),
+          hasNext: false
+        })
+      })
   })
 
-  test('Test calling the character by name endpoint', () =>{
+  test('Test calling the character by name endpoint', () => {
     const axiosGet = jest.fn().mockResolvedValue({
       data: {
         results: [{
           name: 'Rick',
           status: 'Alive',
           species: 'Human',
-          origin: { name: 'Earth'}
+          origin: { name: 'Earth' }
         }],
         info: {
           count: 1
@@ -102,16 +106,18 @@ describe('Test Rick and Morty API Service', () => {
     })
 
     const service = new RickAndMortyApiService()
-    const response = service.getCharacterByName('Rick')
-    expect(axiosGet).toHaveBeenCalledWith('/character?name=Rick')
-    expect(response).resolves.toEqual(
-      {
-        name: 'Rick',
-        status: 'Alive',
-        species: 'Human',
-        origin: 'Earth'
-      }
-    )
+    service.getCharacterByName('Rick')
+      .then(response => {
+        expect(axiosGet).toHaveBeenCalledWith('/character?name=Rick')
+        expect(response).toEqual(
+          {
+            name: 'Rick',
+            status: 'Alive',
+            species: 'Human',
+            origin: 'Earth'
+          }
+        )
+      })
   })
 
   test('Test calling the character by name endpoint with a 404', () => {
@@ -127,8 +133,10 @@ describe('Test Rick and Morty API Service', () => {
     })
 
     const service = new RickAndMortyApiService()
-    const response = service.getCharacterByName('Rick')
-    expect(response).resolves.toBeUndefined()
+    service.getCharacterByName('Rick')
+      .then(response => {
+        expect(response).toBeUndefined()
+      })
   })
 
   test('Test calling the character by name endpoint with another error', () => {
@@ -144,15 +152,17 @@ describe('Test Rick and Morty API Service', () => {
     })
 
     const service = new RickAndMortyApiService()
-    const response = service.getCharacterByName('Rick')
-    expect(response).rejects.toEqual({
-      response: {
-        status: 403
-      }
-    })
+    service.getCharacterByName('Rick')
+      .catch(error => {
+        expect(error).toEqual({
+          response: {
+            status: 403
+          }
+        })
+      })
   })
 
-  test('Test response with unexpected data', () =>{
+  test('Test response with unexpected data', () => {
     const axiosGet = jest.fn().mockResolvedValue({
       data: {
         info: {
@@ -168,7 +178,9 @@ describe('Test Rick and Morty API Service', () => {
     })
 
     const service = new RickAndMortyApiService()
-    const response = service.getCharacterByName('Rick')
-    expect(response).resolves.toBeUndefined()
+    service.getCharacterByName('Rick')
+      .then(response => {
+        expect(response).toBeUndefined()
+      })
   })
 })
