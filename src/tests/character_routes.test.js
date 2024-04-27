@@ -9,10 +9,8 @@ jest.mock('../models')
 
 describe('Test getting N characters', () => {
   beforeEach(() => {
-    jest.spyOn(
-      RickAndMortyApiService.prototype,
-      'getCharacters'
-    ).mockResolvedValueOnce({
+    jest.spyOn(RickAndMortyApiService.prototype, 'getCharacters')
+      .mockResolvedValueOnce({
       results: new Array(20).fill({
         name: 'Rick',
         status: 'Alive',
