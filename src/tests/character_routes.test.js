@@ -11,14 +11,14 @@ describe('Test getting N characters', () => {
   beforeEach(() => {
     jest.spyOn(RickAndMortyApiService.prototype, 'getCharacters')
       .mockResolvedValueOnce({
-      results: new Array(20).fill({
-        name: 'Rick',
-        status: 'Alive',
-        species: 'Human',
-        origin: 'Earth'
-      }),
-      hasNext: true
-    })
+        results: new Array(20).fill({
+          name: 'Rick',
+          status: 'Alive',
+          species: 'Human',
+          origin: 'Earth'
+        }),
+        hasNext: true
+      })
       .mockResolvedValueOnce({
         results: new Array(5).fill({
           name: 'Rick',
@@ -141,6 +141,72 @@ describe('Test creating characters', () => {
       })
       .then(response => {
         expect(response.statusCode).toBe(400)
+      })
+  })
+})
+
+describe('Test getting a character', () => {
+  test('Test getting a character that exists in the database', () => {
+    jest.spyOn(models.Character, 'findOne').mockImplementation(() =>{
+      return {
+        name: 'Rick',
+        status: 'Alive',
+        species: 'Human',
+        origin: 'Earth'
+      }
+    })
+
+    return request(app)
+      .get('/character/Rick')
+      .then(response => {
+        expect(response.statusCode).toBe(200)
+        expect(response.body).toEqual({
+          name: 'Rick',
+          status: 'Alive',
+          species: 'Human',
+          origin: 'Earth'
+        })
+      })
+  })
+
+  test('Test getting a character that does not exist in the database', () => {
+    jest.spyOn(models.Character, 'findOne').mockImplementation(() => {
+      return null
+    })
+
+    jest.spyOn(RickAndMortyApiService.prototype, 'getCharacterByName')
+      .mockResolvedValueOnce({
+        name: 'Rick',
+        status: 'Alive',
+        species: 'Human',
+        origin: 'Earth'
+      })
+
+    return request(app)
+      .get('/character/Rick')
+      .then(response => {
+        expect(response.statusCode).toBe(200)
+        expect(response.body).toEqual({
+          name: 'Rick',
+          status: 'Alive',
+          species: 'Human',
+          origin: 'Earth'
+        })
+      })
+  })
+
+  test('Test getting a character that does not exist in either the DB or the API', () => {
+    jest.spyOn(models.Character, 'findOne').mockImplementation(() => {
+      return null
+    })
+
+    jest.spyOn(RickAndMortyApiService.prototype, 'getCharacterByName')
+      .mockResolvedValueOnce(undefined)
+
+    return request(app)
+      .get('/character/Rick')
+      .then(response => {
+        expect(response.statusCode).toBe(404)
       })
   })
 })
