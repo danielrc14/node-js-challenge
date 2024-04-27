@@ -8,7 +8,7 @@ jest.mock('../../models')
 
 describe('Test getting a character', () => {
   test('Test getting a character that exists in the database', () => {
-    jest.spyOn(models.Character, 'findOne').mockImplementation(() =>{
+    jest.spyOn(models.Character, 'findOne').mockImplementation(() => {
       return {
         name: 'Rick',
         status: 'Alive',
