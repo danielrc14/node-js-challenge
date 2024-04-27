@@ -1,7 +1,7 @@
 import models from '../models'
 import BaseController from './base'
 import RickAndMortyApiService from '../services/rick_and_morty_api_service'
-const { Op } = require('sequelize')
+const { Op, ValidationError } = require('sequelize')
 
 export default class CharacterController extends BaseController {
   CharacterController () { }
@@ -40,16 +40,17 @@ export default class CharacterController extends BaseController {
     let created
 
     try {
-      created = await models.Character.findOrCreate({
+      const data = await models.Character.findOrCreate({
         where: { name: req.body.name },
         defaults: {
           status: req.body.status,
           species: req.body.species,
           origin: req.body.origin
         }
-      })[1]
+      })
+      created = data[1]
     } catch (error) {
-      if (error.name === 'SequelizeValidationError') {
+      if (error instanceof ValidationError) {
         // If there are more than one validation errors, show only the first one
         return super.ErrorBadRequest(res, {
           message: error.errors[0].message
